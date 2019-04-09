@@ -1,0 +1,189 @@
+---
+title: "499 Final Project"
+output: html_notebook
+---
+
+#Load financial data
+
+```{r}
+setwd("C:/Users/charl/OneDrive/Documents/School/Stats 499/final project")
+
+revenue <- read.csv("financial data.csv")
+
+colnames(revenue)[1] <- "Year"
+
+revenue
+```
+
+
+#Financial data scatterplot
+```{r}
+library(ggplot2)
+
+ggplot(revenue, aes(x=Year, y=RevenueMillions, shape = factor(Company))) + geom_point() +   stat_smooth(aes(color=factor(Company)),method = lm, se = F)
+```
+
+
+```{r}
+install.packages("tidyverse")
+library("tidyverse")
+install.packages("RedditExtractoR")
+library("RedditExtractoR")
+
+```
+
+
+Gather the data
+```{r}
+eas = get_reddit(search_terms = "EA", subreddit = "gaming",
+  cn_threshold = 1, page_threshold = 5, sort_by = "comments",
+  wait_time = 2)
+```
+
+
+```{r}
+ea <- as.data.frame(eas)
+```
+
+```{r}
+ea<- separate(ea,comm_date, into=c('day','month','year'), sep = '-')
+
+head(ea)
+
+ea2 <- separate_rows(ea, comment, sep = " ", convert = F)
+
+head(ea2)
+
+count(ea2,year)
+
+ea2$year = as.numeric(ea2$year)
+
+ea3 = ea2 %>% anti_join(stop_words, by = c("comment" = "word"))
+
+ea14 = subset(ea3, year==14, select = c(year, comment))
+
+ea15 = subset(ea3, year==15, select = c(year, comment))
+
+ea16 = subset(ea3, year==16, select = c(year, comment))
+
+ea17 = subset(ea3, year==17, select = c(year, comment))
+
+ea18 = subset(ea3, year==18, select = c(year, comment))
+ea14
+```
+
+```{r}
+blizzards = get_reddit(search_terms = "Blizzard", subreddit = "gaming",
+  cn_threshold = 1, page_threshold = 5, sort_by = "comments",
+  wait_time = 2)
+```
+
+```{r}
+activisions = get_reddit(search_terms = "Activision", subreddit = "gaming",
+  cn_threshold = 1, page_threshold = 5, sort_by = "comments",
+  wait_time = 2)
+```
+
+```{r}
+ab = rbind(activision,blizzard)
+head(ab)
+
+ab<- separate(ab, comm_date, into=c('day','month','year'), sep = '-')
+
+ab2 <- separate_rows(ab, comment, sep = " ", convert = F)
+
+ab2$year = as.numeric(ab2$year)
+
+ab3 = ab2 %>% anti_join(stop_words, by = c("comment" = "word"))
+
+ab14 = subset(ab3, year==14, select = c(year, comment)) %>%
+  count(comment, sort = TRUE)
+
+ab15 = subset(ab3, year==15, select = c(year, comment))
+
+ab16 = subset(ab3, year==16, select = c(year, comment))
+
+ab17 = subset(ab3, year==17, select = c(year, comment))
+
+ab18 = subset(ab3, year==18, select = c(year, comment))
+ab14
+```
+
+```{r}
+blizzard<- separate(blizzard, comm_date, into=c('day','month','year'), sep = '-')
+
+blizzard2 <- separate_rows(blizzard, comment, sep = " ", convert = F)
+
+blizzard2$year = as.numeric(blizzard2$year)
+
+blizzard3 = blizzard2 %>% anti_join(stop_words, by = c("comment" = "word"))
+
+blizzard14 = subset(blizzard3, year==14, select = c(year, comment))
+
+blizzard15 = subset(blizzard3, year==15, select = c(year, comment))
+
+blizzard16 = subset(blizzard3, year==16, select = c(year, comment))
+
+blizzard17 = subset(blizzard3, year==17, select = c(year, comment))
+
+blizzard18 = subset(blizzard3, year==18, select = c(year, comment))
+blizzard14
+```
+
+
+```{r}
+activision<- separate(activisions,comm_date, into=c('day','month','year'), sep = '-')
+
+activision2 <- separate_rows(activision, comment, sep = " ", convert = F)
+
+activision2$year = as.numeric(activision2$year)
+
+activision3 = activision2 %>% anti_join(stop_words, by = c("comment" = "word"))
+
+activision14 = subset(activision3, year==14, select = c(year, comment))
+
+activision15 = subset(activision3, year==15, select = c(year, comment))
+
+activision16 = subset(activision3, year==16, select = c(year, comment))
+
+activision17 = subset(activision3, year==17, select = c(year, comment))
+
+activision18 = subset(activision3, year==18, select = c(year, comment))
+```
+
+```{r}
+activision <- separate(activisions,comm_date, into=c('day','month','year'), sep = '-')
+
+activision2 <- separate_rows(activision, comment, sep = " ", convert = F)
+
+activision2$year = as.numeric(activision2$year)
+
+activision3 = activision2 %>% anti_join(stop_words, by = c("comment" = "word"))
+
+activision14 = subset(activision3, year==14, select = c(year, comment))
+
+activision15 = subset(activision3, year==15, select = c(year, comment))
+
+activision16 = subset(activision3, year==16, select = c(year, comment))
+
+activision17 = subset(activision3, year==17, select = c(year, comment))
+
+activision18 = subset(activision3, year==18, select = c(year, comment))
+```
+
+```{r}
+absentiment = ab14 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment
+```
+
+```{r}
+ggplot(absentiment, aes(x=word, y=sentiment)) +
+  geom_col(show.legend = FALSE)
+```
+
