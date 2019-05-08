@@ -1,0 +1,870 @@
+---
+authors: Samuel Kang and Charlie Beckler
+title: "499 Final Project Report"
+output: html_notebook
+
+---
+#Load packages
+```{r}
+library("tidyverse")
+library("tidytext")
+library("RedditExtractoR")
+library("tm")
+library("nlme")
+library("kableExtra")
+```
+
+#Load the Reddit data
+```{r}
+eas = read_csv("eas")
+blizzards = read_csv("blizzards")
+activisions = read_csv("activisions")
+```
+
+#Reddit Extractor
+```{r} 
+#Use extractor to gather data then load into a csv to save time
+eas = get_reddit(search_terms = "EA", subreddit = "gaming",
+  cn_threshold = 1, page_threshold = 30, sort_by = "comments",
+  wait_time = 2)
+
+#eascsv = write_csv(blizzards, "blizzards")
+```
+
+```{r, echo = FALSE}
+blizzards = get_reddit(search_terms = "Blizzard", subreddit = "gaming",
+  cn_threshold = 1, page_threshold = 30, sort_by = "comments",
+  wait_time = 2)
+
+#blizzardscsv = write_csv(blizzards, "blizzards")
+```
+
+```{r, echo = FALSE}
+activisions = get_reddit(search_terms = "Activision", subreddit = "gaming",
+  cn_threshold = 1, page_threshold = 30, sort_by = "comments",
+  wait_time = 2)
+
+#activisioncsv = write_csv(activisions, "activisions")
+```
+
+#Reddit data seperated into quarters 
+##EA
+```{r, echo = FALSE}
+library("tm")
+
+ea<- separate(eas,comm_date, into=c('day','month','year'), sep = '-')
+
+ea2 <- separate_rows(ea, comment, sep = " ", convert = F)
+
+head(ea2)
+
+count(ea2,year)
+
+ea2$year = as.numeric(ea2$year)
+ea2$month = as.numeric(ea2$month)
+
+stop_words = as.tibble(stopwords("en")) %>%
+  rename("word" = "value")
+
+ea3 = ea2 %>% anti_join(stop_words, by = c("comment" = "word"))
+
+ea11q3 = subset(ea3, year==11, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea11q4 = subset(ea3, year==11, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ea12q1 = subset(ea3, year==11, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ea12q2 = subset(ea3, year=11, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ea12q3 = subset(ea3, year==12, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea12q4 = subset(ea3, year==12, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ea13q1 = subset(ea3, year==12, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ea13q2 = subset(ea3, year=12, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ea13q3 = subset(ea3, year==13, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea13q4 = subset(ea3, year==13, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ea14q1 = subset(ea3, year==13, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ea14q2 = subset(ea3, year=13, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ea14q3 = subset(ea3, year==14, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea14q4 = subset(ea3, year==14, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ea15q1 = subset(ea3, year==14, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ea15q2 = subset(ea3, year=14, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ea15q3 = subset(ea3, year==15, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea15q4 = subset(ea3, year==15, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ea16q1 = subset(ea3, year==15, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ea16q2 = subset(ea3, year=15, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ea16q3 = subset(ea3, year==16, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea16q4 = subset(ea3, year==16, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ea17q1 = subset(ea3, year==16, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ea17q2 = subset(ea3, year=16, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ea17q3 = subset(ea3, year==17, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea17q4 = subset(ea3, year==17, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ea18q1 = subset(ea3, year==17, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ea18q2 = subset(ea3, year=17, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ea18q3 = subset(ea3, year==18, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ea18q4 = subset(ea3, year==18, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+```
+
+
+##Activision-Blizzard
+```{r, echo = FALSE}
+ab = rbind(activisions,blizzards)
+head(ab)
+
+ab<- separate(ab, comm_date, into=c('day','month','year'), sep = '-')
+
+ab2 <- separate_rows(ab, comment, sep = " ", convert = F)
+
+ab2$year = as.numeric(ab2$year)
+
+ab3 = ab2 %>% anti_join(stop_words, by = c("comment" = "word"))
+
+ab11q3 = subset(ab3, year==11, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab11q4 = subset(ab3, year==11, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ab12q1 = subset(ab3, year==11, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ab12q2 = subset(ab3, year=11, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ab12q3 = subset(ab3, year==12, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab12q4 = subset(ab3, year==12, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ab13q1 = subset(ab3, year==12, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ab13q2 = subset(ab3, year=12, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ab13q3 = subset(ab3, year==13, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab13q4 = subset(ab3, year==13, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ab14q1 = subset(ab3, year==13, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ab14q2 = subset(ab3, year=13, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ab14q3 = subset(ab3, year==14, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab14q4 = subset(ab3, year==14, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ab15q1 = subset(ab3, year==14, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ab15q2 = subset(ab3, year=14, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ab15q3 = subset(ab3, year==15, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab15q4 = subset(ab3, year==15, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ab16q1 = subset(ab3, year==15, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ab16q2 = subset(ab3, year=15, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ab16q3 = subset(ab3, year==16, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab16q4 = subset(ab3, year==16, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ab17q1 = subset(ab3, year==16, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ab17q2 = subset(ab3, year=16, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ab17q3 = subset(ab3, year==17, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab17q4 = subset(ab3, year==17, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+ab18q1 = subset(ab3, year==17, select = c(year, month, comment)) %>%
+  filter(month >=7 & month <=9) %>%
+  count(comment, sort = TRUE)
+ab18q2 = subset(ab3, year=17, select = c(year, month, comment)) %>%
+  filter(month >=10 & month <=12) %>%
+  count(comment, sort = TRUE)
+ab18q3 = subset(ab3, year==18, select = c(year, month, comment)) %>%
+  filter(month >=1 & month <=3) %>%
+  count(comment, sort = TRUE)
+ab18q4 = subset(ab3, year==18, select = c(year, month, comment)) %>%
+  filter(month >=4 & month <=6) %>%
+  count(comment, sort = TRUE)
+
+```
+
+
+#Sentiment analysis 
+##EA
+```{r, echo = FALSE}
+#2011
+library("tidytext")
+easentiment11q3 = ea11q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+get_sentiments("bing")
+
+easentiment11q4 = ea11q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+#2012
+easentiment12q1 = ea12q1 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment12q2 = ea12q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment12q3 = ea12q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment12q4 = ea12q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+#2013
+easentiment13q1 = ea13q1 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment13q2 = ea13q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment13q3 = ea13q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment13q4 = ea13q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+#2014
+easentiment14q1 = ea14q1 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment14q2 = ea14q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment14q3 = ea14q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment14q4 = ea14q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+
+#2015
+easentiment15q1 = ea15q1 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment15q2 = ea15q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment15q3 = ea15q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment15q4 = ea15q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+#2016
+easentiment16q1 = ea16q1 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment16q2 = ea16q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment16q3 = ea16q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment16q4 = ea16q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+
+#2017
+easentiment17q1 = ea17q1 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment17q2 = ea17q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# #easentiment17q3 = ea17q3 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+easentiment17q4 = ea17q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+#2018
+easentiment18q1 = ea18q1 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment18q2 = ea18q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment18q3 = ea18q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+easentiment18q4 = ea18q4 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+```
+
+
+##Activision-BLizzard
+```{r, echo = FALSE}
+absentiment11q3 = ab14q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# absentiment11q4 = ab14q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+#2012
+# absentiment12q1 = ab12q1 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+absentiment12q2 = ab12q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment12q3 = ab12q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# absentiment12q4 = ab12q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+#2013
+# #absentiment13q1 = ab13q1 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+absentiment13q2 = ab13q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment13q3 = ab13q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# absentiment13q4 = ab13q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+#2014
+# absentiment14q1 = ab14q1 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+absentiment14q2 = ab14q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment14q3 = ab14q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# absentiment14q4 = ab14q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+
+#2015
+# absentiment15q1 = ab15q1 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+absentiment15q2 = ab15q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment15q3 = ab15q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# #absentiment15q4 = ab15q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+#2016
+# absentiment16q1 = ab16q1 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+absentiment16q2 = ab16q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment16q3 = ab16q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# absentiment16q4 = ab16q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+
+#2017
+# absentiment17q1 = ab17q1 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+absentiment17q2 = ab17q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment17q3 = ab17q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# absentiment17q4 = ab17q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+#2018
+# absentiment18q1 = ab18q1 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+
+absentiment18q2 = ab18q2 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+absentiment18q3 = ab18q3 %>%
+  mutate(word = comment) %>%
+  inner_join(get_sentiments("bing")) %>%
+  select(word, n, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+# absentiment18q4 = ab18q4 %>%
+#   mutate(word = comment) %>%
+#   inner_join(get_sentiments("bing")) %>%
+#   select(word, n, sentiment) %>%
+#   spread(sentiment, n, fill = 0) %>%
+#   mutate(sentiment = positive - negative)
+```
+
+
+#Getting the mean sentiment scores
+##EA
+```{r, echo = FALSE}
+#11
+mean(easentiment11q3$sentiment)
+mean(easentiment11q4$sentiment)
+
+#12
+mean(easentiment12q1$sentiment)
+mean(easentiment12q2$sentiment)
+mean(easentiment12q3$sentiment)
+mean(easentiment12q4$sentiment)
+
+#13
+mean(easentiment13q1$sentiment)
+mean(easentiment13q2$sentiment)
+mean(easentiment13q3$sentiment)
+mean(easentiment13q4$sentiment)
+
+#14
+mean(easentiment14q1$sentiment)
+mean(easentiment14q2$sentiment)
+mean(easentiment14q3$sentiment)
+mean(easentiment14q4$sentiment)
+
+#15
+mean(easentiment15q1$sentiment)
+mean(easentiment15q2$sentiment)
+mean(easentiment15q3$sentiment)
+mean(easentiment15q4$sentiment)
+
+#16
+mean(easentiment16q1$sentiment)
+mean(easentiment16q2$sentiment)
+mean(easentiment16q3$sentiment)
+mean(easentiment16q4$sentiment)
+
+#17
+mean(easentiment17q1$sentiment)
+mean(easentiment17q2$sentiment)
+#mean(easentiment17q3$sentiment)
+mean(easentiment17q4$sentiment)
+
+#18
+mean(easentiment18q1$sentiment)
+mean(easentiment18q2$sentiment)
+mean(easentiment18q3$sentiment)
+mean(easentiment18q4$sentiment)
+```
+
+
+##Activision-Blizzard
+```{r}
+#11
+mean(absentiment11q3$sentiment)
+#mean(absentiment11q4$sentiment)
+
+#12
+#mean(absentiment12q1$sentiment)
+mean(absentiment12q2$sentiment)
+mean(absentiment12q3$sentiment)
+#mean(absentiment12q4$sentiment)
+
+#13
+#mean(absentiment13q1$sentiment)
+mean(absentiment13q2$sentiment)
+mean(absentiment13q3$sentiment)
+#mean(absentiment13q4$sentiment)
+
+#14
+#mean(absentiment14q1$sentiment)
+mean(absentiment14q2$sentiment)
+mean(absentiment14q3$sentiment)
+#mean(absentiment14q4$sentiment)
+
+#15
+#mean(absentiment15q1$sentiment)
+mean(absentiment15q2$sentiment)
+mean(absentiment15q3$sentiment)
+#mean(absentiment15q4$sentiment)
+
+#16
+#mean(absentiment16q1$sentiment)
+mean(absentiment16q2$sentiment)
+mean(absentiment16q3$sentiment)
+#mean(absentiment16q4$sentiment)
+
+#17
+#mean(absentiment17q1$sentiment)
+mean(absentiment17q2$sentiment)
+mean(absentiment17q3$sentiment)
+#mean(absentiment17q4$sentiment)
+
+#18
+#mean(absentiment18q1$sentiment)
+mean(absentiment18q2$sentiment)
+mean(absentiment18q3$sentiment)
+#mean(absentiment18q4$sentiment)
+```
+
+
+#Load the Financial Data
+```{r}
+setwd("~/downloads/499 Final Project")
+
+revenue <- read.csv("financial data final.csv")
+
+colnames(revenue)[1] <- "Year"
+
+head(revenue)
+```
+
+
+#Time Series Regression
+```{r}
+library(nlme)
+interactModel = lme(RevenueAdjusted~SentimentScore*Company, random = ~1|Company/SentimentScore/RevenueAdjusted, data = revenue, method = "ML")
+
+summary(interactModel)
+```
+
+```{r}
+ggplot(revenue, aes(Quarter, RevenueAdjusted, group = Company, col = Company)) + 
+  geom_point() + geom_smooth(method = "lm", se = F) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ggtitle("Figure 1. Revenue by Quarter")
+```
+
+```{r}
+ggplot(revenue, aes(Quarter, SentimentScore, group = Company, col = Company)) + 
+  geom_point() + geom_smooth(method = "lm", se = F) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ggtitle("Figure 2. Sentiment by Quarter")
+```
+
+```{r}
+ggplot(revenue, aes(SentimentScore, RevenueAdjusted, group = Company, col = Company)) + 
+  geom_point() + geom_smooth(method = "lm", se = F) + ggtitle("Figure 3. Revenue by Sentiment")
+```
